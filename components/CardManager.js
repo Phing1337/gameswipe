@@ -67,16 +67,6 @@ export class CardManager {
                         : `<span>$${game.price.toFixed(2)}</span>`
                     }
                 </div>
-                <div class="card-actions">
-                    <button class="action-btn ignore-btn">
-                        <span class="material-icons">close</span>
-                        <span>Skip</span>
-                    </button>
-                    <button class="action-btn wishlist-btn">
-                        <span class="material-icons">favorite</span>
-                        <span>Wishlist</span>
-                    </button>
-                </div>
                 </div>
             </div>
         `;

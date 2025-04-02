@@ -25,6 +25,35 @@
         <div class="swipe-indicator swipe-indicator-right">
           <span class="material-icons">favorite</span>
         </div>
+        
+        <!-- Tutorial Overlay -->
+        <div class="tutorial-overlay" id="tutorial-overlay">
+          <div class="tutorial-content">
+            <h2>How to Play</h2>
+            <div class="tutorial-step">
+              <div class="tutorial-icon">
+                <span class="material-icons">arrow_right_alt</span>
+              </div>
+              <p>Swipe <strong>right</strong> to add to wishlist</p>
+            </div>
+            <div class="tutorial-step">
+              <div class="tutorial-icon rotate-left">
+                <span class="material-icons">arrow_right_alt</span>
+              </div>
+              <p>Swipe <strong>left</strong> to skip</p>
+            </div>
+            <button class="tutorial-close-btn" id="tutorial-close-btn">Got it!</button>
+          </div>
+        </div>
+        
+        <!-- Action Feedback -->
+        <div class="action-feedback wishlist-feedback" id="wishlist-feedback">
+          <span class="material-icons">favorite</span>
+          <span class="feedback-text">+1</span>
+        </div>
+        <div class="action-feedback skip-feedback" id="skip-feedback">
+          <span class="material-icons">close</span>
+        </div>
       </section>
       
       <!-- Wishlist View -->

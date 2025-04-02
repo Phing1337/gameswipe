@@ -5,6 +5,7 @@ import { CardManager } from './components/CardManager.js';
 const wishlistedGames = [];
 const skippedGames = [];
 let cardManager;
+let hasShownTutorial = false; // Track tutorial state
 
 // DOM Elements
 const cardContainer = document.getElementById('card-container');
@@ -14,6 +15,10 @@ const showWishlistBtn = document.getElementById('show-wishlist');
 const wishlistGamesContainer = document.getElementById('wishlist-games');
 const historyGamesContainer = document.getElementById('history-games');
 const navButtons = document.querySelectorAll('.nav-btn');
+const tutorialOverlay = document.getElementById('tutorial-overlay');
+const tutorialCloseBtn = document.getElementById('tutorial-close-btn');
+const wishlistFeedback = document.getElementById('wishlist-feedback');
+const skipFeedback = document.getElementById('skip-feedback');
 
 // Initialize the app
 async function initApp() {
@@ -124,14 +129,16 @@ function triggerHapticFeedback() {
 }
 
 // Skip the current game
-// Make functions globally available
 window.skipGame = function skipGame() {
     triggerHapticFeedback();
     const currentGame = gameService.getCurrentGame();
     skippedGames.push(currentGame);
     
+    // Show skip feedback
+    showFeedback('skip');
+    
     gameService.moveToNextGame();
-    displayCards(); // This will now update the entire queue
+    displayCards(); 
     updateHistoryView();
 }
 
@@ -141,9 +148,27 @@ window.addToWishlist = function addToWishlist() {
     const currentGame = gameService.getCurrentGame();
     wishlistedGames.push(currentGame);
     
+    // Show wishlist feedback
+    showFeedback('wishlist');
+    
     gameService.moveToNextGame();
-    displayCards(); // This will now update the entire queue
+    displayCards(); 
     updateWishlistView();
+}
+
+// Show feedback animation
+function showFeedback(type) {
+    const element = type === 'wishlist' ? wishlistFeedback : skipFeedback;
+    
+    if (element) {
+        // Add the show class
+        element.classList.add('show');
+        
+        // Remove it after animation completes
+        setTimeout(() => {
+            element.classList.remove('show');
+        }, 1500);
+    }
 }
 
 // Reset to first game
@@ -237,6 +262,14 @@ function setupEventListeners() {
     showHistoryBtn.addEventListener('click', () => showView('history'));
     showWishlistBtn.addEventListener('click', () => showView('wishlist'));
     
+    // Tutorial dialog
+    if (tutorialCloseBtn) {
+        tutorialCloseBtn.addEventListener('click', closeTutorial);
+    }
+    
+    // Check if we should show the tutorial
+    checkAndShowTutorial();
+    
     // Add keyboard controls
     document.addEventListener('keydown', (e) => {
         if (cardManager.isAnimating) return;
@@ -262,11 +295,30 @@ function setupEventListeners() {
         }
     });
 
-    // Remove the incorrect CardManager setup
-    const discoverView = document.getElementById('discover-view');
-    if (discoverView) {
-        // The CardManager already handles its own swipe setup in updateCardQueue
-        renderNextCard(true);
+    // The CardManager already handles its own swipe setup in updateCardQueue
+    renderNextCard(true);
+}
+
+// Check and show tutorial if needed
+function checkAndShowTutorial() {
+    // Check localStorage to see if user has seen tutorial
+    const tutorialSeen = localStorage.getItem('tutorialSeen');
+    
+    if (!tutorialSeen && tutorialOverlay) {
+        // Show tutorial
+        tutorialOverlay.classList.remove('hidden');
+    } else if (tutorialOverlay) {
+        // Hide tutorial
+        tutorialOverlay.classList.add('hidden');
+    }
+}
+
+// Close tutorial and remember user's preference
+function closeTutorial() {
+    if (tutorialOverlay) {
+        tutorialOverlay.classList.add('hidden');
+        // Store in localStorage that tutorial has been seen
+        localStorage.setItem('tutorialSeen', 'true');
     }
 }
 
