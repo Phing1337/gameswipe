@@ -14,7 +14,16 @@ export class CardManager {
             initialTouchX: 0,
             initialTouchY: 0
         };
-        console.log('CardManager initialized with container:', container);
+
+        // Ensure container is properly styled
+        this.container.style.position = 'relative';
+        this.container.style.width = '100%';
+        this.container.style.height = '100%';
+        this.container.style.zIndex = '3';
+        
+        // Get references to the swipe indicators
+        this.leftIndicator = document.querySelector('.swipe-indicator-left');
+        this.rightIndicator = document.querySelector('.swipe-indicator-right');
     }
 
     createCardElement(game, isPreview = false) {
@@ -200,8 +209,13 @@ export class CardManager {
         };
 
         this._boundDrag = (e) => {
-            if (!this.isDragging || (e.type === 'mousemove' && !this.mouseIsDown)) {
-                console.log('Drag move ignored - not dragging or mouse not down');
+            if (!this.isDragging) {
+                console.log('Drag move ignored - not dragging');
+                return;
+            }
+            
+            if (e.type === 'mousemove' && !this.mouseIsDown) {
+                console.log('Mouse move ignored - mouse not down');
                 return;
             }
             
@@ -234,6 +248,28 @@ export class CardManager {
                 translateX: this.dragState?.translateX
             });
             
+            // Special handling for touch events - always process them
+            if (e.type === 'touchend' && this.isDragging) {
+                this.isDragging = false;
+                this.mouseIsDown = false;
+                this.isAnimating = true;
+                
+                const threshold = window.innerWidth * 0.15;
+                
+                if (this.dragState.translateX > threshold) {
+                    console.log('Threshold reached for right swipe');
+                    this.animateSwipe('right', onSwipeRight);
+                } else if (this.dragState.translateX < -threshold) {
+                    console.log('Threshold reached for left swipe');
+                    this.animateSwipe('left', onSwipeLeft);
+                } else {
+                    console.log('Threshold not reached, resetting position');
+                    this.resetPosition();
+                }
+                return;
+            }
+            
+            // For mouse events, check if we're actually dragging
             if (!this.isDragging || (e.type === 'mouseup' && !this.mouseIsDown)) {
                 console.log('End drag ignored - not dragging or mouse was not down');
                 return;
@@ -299,15 +335,24 @@ export class CardManager {
         
         this.currentCard.style.transform = `translateX(${this.dragState.translateX}px) translateY(${translateY}px) rotate(${rotation}deg)`;
         
+        // Update discover view class for indicator visibility
+        const discoverView = document.getElementById('discover-view');
+        
         // Visual feedback based on swipe direction
         if (this.dragState.translateX > 50) {
-            this.currentCard.classList.add('swiping-right');
-            this.currentCard.classList.remove('swiping-left');
+            discoverView.classList.add('swiping-right');
+            discoverView.classList.remove('swiping-left');
+            if (this.rightIndicator) this.rightIndicator.style.opacity = Math.min(Math.abs(this.dragState.translateX) / 200, 1);
+            if (this.leftIndicator) this.leftIndicator.style.opacity = '0';
         } else if (this.dragState.translateX < -50) {
-            this.currentCard.classList.add('swiping-left');
-            this.currentCard.classList.remove('swiping-right');
+            discoverView.classList.add('swiping-left');
+            discoverView.classList.remove('swiping-right');
+            if (this.leftIndicator) this.leftIndicator.style.opacity = Math.min(Math.abs(this.dragState.translateX) / 200, 1);
+            if (this.rightIndicator) this.rightIndicator.style.opacity = '0';
         } else {
-            this.currentCard.classList.remove('swiping-left', 'swiping-right');
+            discoverView.classList.remove('swiping-left', 'swiping-right');
+            if (this.leftIndicator) this.leftIndicator.style.opacity = '0';
+            if (this.rightIndicator) this.rightIndicator.style.opacity = '0';
         }
         
         if (this.isDragging) {
@@ -325,7 +370,6 @@ export class CardManager {
         // Apply the final swipe animation
         this.currentCard.style.transition = 'transform 0.5s ease-out';
         this.currentCard.style.transform = `translateX(${translateX}px) rotate(${rotation}deg)`;
-        this.currentCard.classList.add(direction === 'right' ? 'swiping-right' : 'swiping-left');
         
         // Prepare next card animation and start playing video
         if (this.nextCard) {
@@ -345,20 +389,33 @@ export class CardManager {
         setTimeout(() => {
             if (this.currentCard && this.currentCard.parentNode) {
                 // Cleanup video before removing card
-            const video = this.currentCard.querySelector('.game-video');
-            if (video) {
-                video.pause();
-                video.removeAttribute('src');
-                video.load();
+                const video = this.currentCard.querySelector('.game-video');
+                if (video) {
+                    video.pause();
+                    video.removeAttribute('src');
+                    video.load();
+                }
+                this.currentCard.parentNode.removeChild(this.currentCard);
             }
-            this.currentCard.parentNode.removeChild(this.currentCard);
-            }
+            
+            // Make the nextCard the current card
             this.currentCard = this.nextCard;
             this.nextCard = null;
+            
+            // Reset state flags
             this.isDragging = false;
             this.mouseIsDown = false;
             this.isAnimating = false;
             
+            // Reset indicator styles
+            const discoverView = document.getElementById('discover-view');
+            if (discoverView) {
+                discoverView.classList.remove('swiping-left', 'swiping-right');
+            }
+            if (this.leftIndicator) this.leftIndicator.style.opacity = '0';
+            if (this.rightIndicator) this.rightIndicator.style.opacity = '0';
+            
+            // Call the callback after everything is set up
             if (callback) callback();
         }, 500);
     }
@@ -368,7 +425,12 @@ export class CardManager {
         
         this.currentCard.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
         this.currentCard.style.transform = '';
-        this.currentCard.classList.remove('swiping-left', 'swiping-right');
+        
+        // Reset indicators
+        const discoverView = document.getElementById('discover-view');
+        discoverView.classList.remove('swiping-left', 'swiping-right');
+        if (this.leftIndicator) this.leftIndicator.style.opacity = '0';
+        if (this.rightIndicator) this.rightIndicator.style.opacity = '0';
         
         // Reset next card position
         if (this.nextCard) {

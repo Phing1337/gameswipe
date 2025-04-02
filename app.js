@@ -28,11 +28,13 @@ async function initApp() {
     // Initialize card manager
     cardManager = new CardManager(cardContainer);
     
-    // Start with first cards
-    renderNextCard(true);
-    
     // Set up event listeners
     setupEventListeners();
+    
+    // Start with first cards after a short delay to ensure DOM is ready
+    setTimeout(() => {
+        displayCards();
+    }, 100);
 }
 
 // Load games with a slight delay to show loading state
