@@ -66,5 +66,7 @@ export class SteamAPI {
     }
 }
 
-// Export singleton instance
-export const steamAPI = new SteamAPI(process.env.STEAM_API_KEY || '');
+// Export singleton instance with empty API key for public GitHub Pages demo
+// NOTE: For production use, implement proper API key management using environment variables
+// or a backend proxy to protect your API key
+export const steamAPI = new SteamAPI('');  // Empty string for public repository
