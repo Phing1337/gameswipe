@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#121212">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Game Swiper</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+  <div class="app">
+    <!-- Full-screen views -->
+    <div class="views">
+      <!-- Discover View -->
+      <section id="discover-view" class="view active">
+        <div class="card-container" id="card-container">
+          <!-- Cards will be inserted here by JavaScript -->
+        </div>
+        <div class="swipe-indicator swipe-indicator-left">
+          <span class="material-icons">close</span>
+        </div>
+        <div class="swipe-indicator swipe-indicator-right">
+          <span class="material-icons">favorite</span>
+        </div>
+      </section>
+      
+      <!-- Wishlist View -->
+      <section id="wishlist-view" class="view">
+        <header class="view-header">
+          <h1>My Wishlist</h1>
+        </header>
+        <div class="wishlist-games" id="wishlist-games">
+          <p class="empty-state">No games wishlisted yet!</p>
+        </div>
+      </section>
+      
+      <!-- History View -->
+      <section id="history-view" class="view">
+        <header class="view-header">
+          <h1>Previously Skipped</h1>
+        </header>
+        <div class="history-games" id="history-games">
+          <p class="empty-state">No game history yet!</p>
+        </div>
+      </section>
+    </div>
+    
+    <!-- Fixed navigation controls that stay at the bottom across all views -->
+    <div class="floating-controls">
+      <div class="nav-btn history" id="show-history">
+        <span class="material-icons">history</span>
+        <span class="nav-text">History</span>
+      </div>
+      <div class="nav-btn games active" id="show-games">
+        <span class="material-icons">sports_esports</span>
+        <span class="nav-text">Games</span>
+      </div>
+      <div class="nav-btn wishlist" id="show-wishlist">
+        <span class="material-icons">favorite</span>
+        <span class="nav-text">Wishlist</span>
+      </div>
+    </div>
+  </div>
+  
+  <script src="app.js" type="module"></script>
+</body>
+</html>
