@@ -14,14 +14,13 @@ export class Game {
     }
 }
 
-// Initial mock data with portrait videos
+// Updated mock data with YouTube videos
 export const mockGames = [
     {
         id: 1,
         title: "Halo Infinite",
         image: "https://cdn.cloudflare.steamstatic.com/steam/apps/1240440/ss_c31322c3073145ec3b87c7bf6171d9075a504923.600x338.jpg",
-        // Using portrait video clips for better mobile experience
-        video: "https://cdn.cloudflare.steamstatic.com/steam/apps/256859750/movie480_vp9.webm",
+        video: "https://www.youtube.com/embed/PyMlV5_HRWk",
         releaseDate: "December 8, 2021",
         platforms: ["Xbox Series X|S", "Xbox One", "PC"],
         genre: "First-Person Shooter",
@@ -33,7 +32,7 @@ export const mockGames = [
         id: 2,
         title: "Forza Horizon 5",
         image: "https://cdn.cloudflare.steamstatic.com/steam/apps/1551360/ss_26f6b9f55d2620cd67316413736997e084785b1f.600x338.jpg",
-        video: "https://cdn.cloudflare.steamstatic.com/steam/apps/256859481/movie480_vp9.webm",
+        video: "https://www.youtube.com/embed/FYH9n37B7Yw",
         releaseDate: "November 9, 2021",
         platforms: ["Xbox Series X|S", "Xbox One", "PC"],
         genre: "Racing",
@@ -45,7 +44,7 @@ export const mockGames = [
         id: 3,
         title: "Starfield",
         image: "https://cdn.cloudflare.steamstatic.com/steam/apps/1716740/ss_c26d646d79337a7761b04a1e86d5511c7f230519.600x338.jpg",
-        video: "https://cdn.cloudflare.steamstatic.com/steam/apps/256954918/movie480_vp9.webm",
+        video: "https://www.youtube.com/embed/Hs-1_H-XVcE",
         releaseDate: "September 6, 2023",
         platforms: ["Xbox Series X|S", "PC"],
         genre: "Action RPG",
@@ -57,7 +56,7 @@ export const mockGames = [
         id: 4,
         title: "Microsoft Flight Simulator",
         image: "https://cdn.cloudflare.steamstatic.com/steam/apps/1250410/ss_c23048b46c1c33714bd01ecc68595cd91d9124a7.600x338.jpg",
-        video: "https://cdn.cloudflare.steamstatic.com/steam/apps/256866168/movie480_vp9.webm",
+        video: "https://www.youtube.com/embed/TYqJALPVn0Y",
         releaseDate: "July 27, 2021",
         platforms: ["Xbox Series X|S", "PC"],
         genre: "Simulation",
@@ -69,7 +68,7 @@ export const mockGames = [
         id: 5,
         title: "Sea of Thieves",
         image: "https://cdn.cloudflare.steamstatic.com/steam/apps/1172620/ss_29c4440e27ed41991fc0a43504c22de825aa8c6c.600x338.jpg",
-        video: "https://cdn.cloudflare.steamstatic.com/steam/apps/256859010/movie480_vp9.webm",
+        video: "https://www.youtube.com/embed/r5JIBaasuE8",
         releaseDate: "March 20, 2018",
         platforms: ["Xbox Series X|S", "Xbox One", "PC"],
         genre: "Action-Adventure",

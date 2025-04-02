@@ -48,10 +48,29 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #121212;
+  background: linear-gradient(45deg, 
+    #1a1a2e,
+    #16213e,
+    #1a1a2e,
+    #16213e
+  );
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
   color: #fff;
   height: 100vh;
+  width: 100vw;
   overflow: hidden;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .app {
@@ -63,52 +82,107 @@ body {
   left: 0;
 }
 
-/* Swipe Indicators */
-.swipe-indicator {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 120px;
-  height: 120px;
-  border-radius: 60px;
+/* Card Container with improved spacing */
+.card-container {
+  position: relative;
+  width: 100%;
+  height: calc(100% - 96px); /* Adjusted to leave space above navigation */
+  padding: 16px;
+  margin-bottom: 20px; /* Space between cards and navigation */
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  font-size: 48px;
-  opacity: 0;
+  z-index: 3;
+}
+
+/* Card styling with adjusted height for better spacing */
+.game-card {
+  position: absolute;
+  width: calc(100% - 32px);
+  /* Adjust height to leave space above navigation */
+  height: calc(100% - 32px);
+  left: 16px;
+  top: 16px;
+  background-color: #1a1a1a;
+  border-radius: 24px;
+  overflow: hidden;
+  transform-origin: center;
+  will-change: transform;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4),
+              0 4px 8px rgba(0, 0, 0, 0.2),
+              0 0 0 1px rgba(255, 255, 255, 0.05),
+              inset 0 0 32px rgba(255, 255, 255, 0.02);
+  transition: transform 0.3s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.game-card.next-card {
+  transform: translate(0, 10px) scale(0.95);
+  opacity: 0.7;
   pointer-events: none;
-  z-index: 99;
-  transition: opacity 0.2s ease;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
 }
 
-.swipe-indicator .material-icons {
-  font-size: 48px;
+/* Media container */
+.media-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  overflow: hidden;
 }
 
-.swipe-indicator-left {
-  left: 20px;
-  background-color: rgba(244, 67, 54, 0.8);
+/* Image styling */
+.game-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  position: absolute;
+  z-index: 1;
 }
 
-.swipe-indicator-right {
-  right: 20px;
-  background-color: rgba(76, 175, 80, 0.8);
+/* Enhanced Video styling for vertical orientation */
+.video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  overflow: hidden;
 }
 
-.swiping-left .swipe-indicator-left,
-.swiping-right .swipe-indicator-right {
-  opacity: 1;
+/* YouTube iframe specific styling for vertical fit */
+iframe.game-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 177.77778vh; /* 16:9 aspect ratio (9/16 = 0.5625) */
+  height: 100%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  border: none;
 }
 
-/* View Container */
+/* Regular video element styling */
+video.game-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Views container with adjusted padding for navigation */
 .views {
   width: 100%;
   height: 100%;
   position: relative;
-  padding-bottom: 96px; /* Make room for the fixed controls */
+  padding-bottom: 76px; /* Make room for the fixed controls */
 }
 
 .view {
@@ -116,8 +190,9 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
-  background-color: #121212;
+  /* Adjust height to leave space for navigation */
+  height: calc(100% - 76px);
+  background-color: rgba(18, 18, 18, 0.95);
   visibility: hidden;
   opacity: 0;
   transform: translateX(100%);
@@ -133,133 +208,36 @@ body {
   z-index: 2;
 }
 
-/* Update card container to ensure it's always visible */
-.card-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  z-index: 3;
-}
-
-/* Add slide directions */
-.view.slide-left {
-  transform: translateX(-100%);
-}
-
-/* Card styling */
-.game-card {
-    position: absolute;
-    width: calc(100% - 32px);
-    height: calc(100% - 32px);
-    left: 16px;
-    top: 16px;
-    background-color: #1a1a1a;
-    border-radius: 24px;
-    overflow: hidden;
-    transform-origin: center;
-    will-change: transform;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.game-card.next-card {
-    transform: scale(0.95) translateY(8px);
-    opacity: 0.8;
-}
-
-.game-card.next-card .game-info {
-    opacity: 0;
-}
-
-.game-card .game-info {
-    opacity: 1;
-    transition: opacity 0.3s ease;
-}
-
-/* Media container */
-.media-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    background-color: #000;
-    overflow: hidden;
-    border-radius: 24px;
-}
-
-.game-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  position: absolute;
-  z-index: 1;
-}
-
-/* Video styling */
-.video-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  overflow: hidden;
-}
-
-.game-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-/* Video overlay for controls */
-.video-overlay {
-  position: absolute;
-  top: 0;
+/* Floating Controls with enhanced styling */
+.floating-controls {
+  position: fixed;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  z-index: 3;
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  padding: 16px;
-  pointer-events: none; /* Allow taps to pass through except for buttons */
-}
-
-.mute-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.5);
-  border: none;
-  display: flex;
+  justify-content: space-around;
   align-items: center;
-  justify-content: center;
-  color: white;
-  cursor: pointer;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  pointer-events: auto; /* Make button clickable */
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  padding: 0;
+  z-index: 100;
+  background-color: rgba(18, 18, 18, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  height: 76px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.mute-btn:active {
-  transform: scale(0.95);
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* Game info overlay */
+/* Game info overlay with better gradient */
 .game-info {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   padding: 80px 20px 20px;
-  background: linear-gradient(transparent, rgba(0,0,0,0.9));
+  background: linear-gradient(to bottom, 
+    rgba(0,0,0,0),
+    rgba(0,0,0,0.7) 40%,
+    rgba(0,0,0,0.9)
+  );
   z-index: 3;
 }
 
@@ -324,24 +302,6 @@ body {
   border-radius: 4px;
   font-size: 14px;
   margin-left: 8px;
-}
-
-/* Floating Controls */
-.floating-controls {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 0;
-  z-index: 100; /* Ensure it appears above all views */
-  background-color: rgba(18, 18, 18, 0.9);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  height: 76px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Nav button styles */

@@ -31,23 +31,36 @@ export class CardManager {
         card.className = `game-card${isPreview ? ' next-card' : ''}`;
         card.style.zIndex = isPreview ? '1' : '2';
         
+        // Check if the video URL is a YouTube embed URL
+        const isYouTubeVideo = game.video && game.video.includes('youtube.com/embed');
+        
         const content = `
             <div class="media-container">
                 <img src="${game.image}" alt="${game.title}" class="game-image">
                 <div class="video-container">
-                    <video 
-                        src="${game.video}"
-                        class="game-video"
-                        loop
-                        playsinline
-                        muted
-                    ></video>
+                    ${isYouTubeVideo ? 
+                        `<iframe 
+                            src="${game.video}?start=10&autoplay=${isPreview ? '0' : '1'}&mute=1&enablejsapi=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&loop=1&playlist=${game.video.split('/').pop()}&playsinline=1" 
+                            class="game-video" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>` : 
+                        `<video 
+                            src="${game.video}"
+                            class="game-video"
+                            loop
+                            playsinline
+                            muted
+                        ></video>`
+                    }
                 </div>
                 <div class="video-overlay">
                     <button class="mute-btn" data-game-id="${game.id}">
                         <span class="material-icons">volume_off</span>
                     </button>
                 </div>
+            </div>
             <div class="game-info">
                 <h2 class="game-title">${game.title}</h2>
                 <div class="game-meta">
@@ -67,7 +80,6 @@ export class CardManager {
                         : `<span>$${game.price.toFixed(2)}</span>`
                     }
                 </div>
-                </div>
             </div>
         `;
         
@@ -80,21 +92,38 @@ export class CardManager {
         if (muteBtn && video) {
             muteBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                this.toggleMute(video, muteBtn);
+                this.toggleMute(video, muteBtn, isYouTubeVideo);
             });
         }
 
-        if (video && !isPreview) {
+        // Play regular video if it's not a YouTube video and not a preview card
+        if (video && !isPreview && !isYouTubeVideo) {
             video.play().catch(error => console.log('Video autoplay prevented:', error));
         }
         
         return card;
     }
 
-    toggleMute(video, muteBtn) {
+    toggleMute(video, muteBtn, isYouTubeVideo) {
         if (!video || !muteBtn) return;
-        video.muted = !video.muted;
-        muteBtn.innerHTML = `<span class="material-icons">${video.muted ? 'volume_off' : 'volume_up'}</span>`;
+        
+        if (isYouTubeVideo) {
+            // YouTube iframe API handling
+            try {
+                const isMuted = video.src.includes('&mute=1');
+                const newSrc = isMuted 
+                    ? video.src.replace('&mute=1', '&mute=0') 
+                    : video.src.replace('&mute=0', '&mute=1');
+                video.src = newSrc;
+                muteBtn.innerHTML = `<span class="material-icons">${isMuted ? 'volume_up' : 'volume_off'}</span>`;
+            } catch (error) {
+                console.error('Error toggling YouTube mute:', error);
+            }
+        } else {
+            // Regular video element
+            video.muted = !video.muted;
+            muteBtn.innerHTML = `<span class="material-icons">${video.muted ? 'volume_off' : 'volume_up'}</span>`;
+        }
     }
 
     updateCardQueue(games) {
@@ -370,8 +399,15 @@ export class CardManager {
             
             // Start playing the video of the next card
             const nextVideo = this.nextCard.querySelector('.game-video');
-            if (nextVideo && nextVideo.readyState >= 2) {
-                nextVideo.play().catch(e => console.log('Could not autoplay next video:', e));
+            if (nextVideo) {
+                if (nextVideo.tagName.toLowerCase() === 'iframe') {
+                    // Update YouTube video parameters to start playing
+                    if (nextVideo.src.includes('autoplay=0')) {
+                        nextVideo.src = nextVideo.src.replace('autoplay=0', 'autoplay=1');
+                    }
+                } else if (nextVideo.readyState >= 2) {
+                    nextVideo.play().catch(e => console.log('Could not autoplay next video:', e));
+                }
             }
         }
         
@@ -381,9 +417,15 @@ export class CardManager {
                 // Cleanup video before removing card
                 const video = this.currentCard.querySelector('.game-video');
                 if (video) {
-                    video.pause();
-                    video.removeAttribute('src');
-                    video.load();
+                    if (video.tagName.toLowerCase() === 'iframe') {
+                        // Stop YouTube video
+                        video.src = '';
+                    } else {
+                        // Stop regular video
+                        video.pause();
+                        video.removeAttribute('src');
+                        video.load();
+                    }
                 }
                 this.currentCard.parentNode.removeChild(this.currentCard);
             }
